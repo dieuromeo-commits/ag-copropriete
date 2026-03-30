@@ -22,7 +22,6 @@
       --text2: #9090b0;
       --border: rgba(255,255,255,0.08);
       --radius: 16px;
-      --shadow: 0 4px 24px rgba(0,0,0,0.4);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     body {
@@ -76,21 +75,15 @@
 
     /* ── STATUS BAR ── */
     .status-bar {
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      display: flex; align-items: center; gap: 8px;
       padding: 10px 20px;
       background: var(--surface2);
       border-bottom: 1px solid var(--border);
-      font-size: 13px;
-      color: var(--text2);
-      min-height: 40px;
+      font-size: 13px; color: var(--text2); min-height: 40px;
     }
     .status-dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: var(--text2);
-      flex-shrink: 0;
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--text2); flex-shrink: 0;
     }
     .status-dot.recording { background: var(--red); animation: pulse 1s infinite; }
     .status-dot.paused { background: var(--orange); }
@@ -100,348 +93,296 @@
       50% { opacity: 0.5; transform: scale(0.8); }
     }
 
-    /* ── MAIN CONTENT ── */
+    /* ── MAIN ── */
     main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      padding: 16px;
-      gap: 14px;
-      overflow-y: auto;
-      padding-bottom: 200px;
+      flex: 1; display: flex; flex-direction: column;
+      padding: 16px; gap: 14px; overflow-y: auto;
+      padding-bottom: 240px;
     }
 
-    /* ── AG INFO CARD ── */
-    .info-card {
+    /* ── CARDS ── */
+    .card {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       padding: 16px;
     }
-    .info-card-title {
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--text2);
-      margin-bottom: 10px;
+    .card-title {
+      font-size: 12px; text-transform: uppercase;
+      letter-spacing: 1px; color: var(--text2); margin-bottom: 12px;
     }
     .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .info-field label {
-      display: block;
-      font-size: 11px;
-      color: var(--text2);
-      margin-bottom: 4px;
-    }
+    .info-field label { display: block; font-size: 11px; color: var(--text2); margin-bottom: 4px; }
     .info-field input {
       width: 100%;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 8px 10px;
-      color: var(--text);
-      font-size: 14px;
-      outline: none;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 8px 10px;
+      color: var(--text); font-size: 14px; outline: none;
       transition: border-color 0.2s;
     }
     .info-field input:focus { border-color: var(--accent); }
     .info-field.full { grid-column: 1 / -1; }
 
+    /* ── PARTICIPANTS SETUP ── */
+    .speaker-chips {
+      display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;
+      min-height: 16px;
+    }
+    .speaker-chip {
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 10px 6px 8px;
+      border-radius: 20px; border: 2px solid;
+      font-size: 13px; font-weight: 600;
+      background: var(--surface2);
+      cursor: default;
+    }
+    .chip-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .chip-remove {
+      margin-left: 4px; font-size: 15px; line-height: 1;
+      cursor: pointer; opacity: 0.6;
+      background: none; border: none; color: inherit; padding: 0;
+    }
+    .chip-remove:hover { opacity: 1; }
+    .add-speaker-row { display: flex; gap: 8px; }
+    .add-speaker-input {
+      flex: 1;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 9px 12px;
+      color: var(--text); font-size: 14px; outline: none;
+      transition: border-color 0.2s;
+    }
+    .add-speaker-input:focus { border-color: var(--accent); }
+    .btn-add-speaker {
+      padding: 9px 16px;
+      background: var(--accent); color: #fff;
+      border: none; border-radius: 8px;
+      font-size: 14px; font-weight: 700; cursor: pointer;
+      white-space: nowrap; flex-shrink: 0;
+      transition: opacity 0.15s;
+    }
+    .btn-add-speaker:active { opacity: 0.75; }
+
     /* ── TRANSCRIPT ── */
     .transcript-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      display: flex;
-      flex-direction: column;
-      flex: 1;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); display: flex; flex-direction: column; flex: 1;
     }
     .transcript-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 16px;
-      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 16px; border-bottom: 1px solid var(--border);
     }
     .transcript-title {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text2);
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
+      font-size: 13px; font-weight: 600; color: var(--text2);
+      text-transform: uppercase; letter-spacing: 0.8px;
     }
     .word-count { font-size: 12px; color: var(--text2); }
     .transcript-body {
-      padding: 14px 16px;
-      min-height: 220px;
-      max-height: 45vh;
-      overflow-y: auto;
-      font-size: 15px;
-      line-height: 1.7;
-      color: var(--text);
+      padding: 14px 16px; min-height: 200px; max-height: 42vh;
+      overflow-y: auto; font-size: 15px; line-height: 1.7; color: var(--text);
     }
     .transcript-body:empty::before {
       content: "La transcription apparaîtra ici dès que vous commencerez à parler…";
-      color: var(--text2);
-      font-style: italic;
+      color: var(--text2); font-style: italic;
     }
     .segment {
-      margin-bottom: 10px;
-      padding: 8px 10px;
-      background: var(--surface2);
-      border-radius: 8px;
+      margin-bottom: 10px; padding: 8px 10px;
+      background: var(--surface2); border-radius: 8px;
       border-left: 3px solid var(--accent);
     }
     .segment.marker {
       border-left-color: var(--orange);
       background: rgba(251,146,60,0.08);
-      font-weight: 600;
-      font-size: 13px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      font-weight: 600; font-size: 13px;
+      text-transform: uppercase; letter-spacing: 0.5px;
     }
     .segment-meta {
-      font-size: 11px;
-      color: var(--text2);
-      margin-bottom: 3px;
-      display: flex;
-      gap: 8px;
+      font-size: 11px; color: var(--text2);
+      margin-bottom: 3px; display: flex; gap: 8px; align-items: center;
     }
-    .segment-speaker { color: var(--accent); font-weight: 600; }
+    .segment-speaker { font-weight: 700; font-size: 12px; }
     .interim-text {
-      color: var(--text2);
-      font-style: italic;
-      padding: 6px 10px;
-      font-size: 14px;
+      color: var(--text2); font-style: italic;
+      padding: 6px 10px; font-size: 14px;
     }
-
-    /* ── SPEAKER TOOLBAR ── */
-    .speaker-toolbar {
-      padding: 10px 16px;
-      border-top: 1px solid var(--border);
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      flex-wrap: wrap;
+    .marker-toolbar {
+      padding: 10px 16px; border-top: 1px solid var(--border);
+      display: flex; gap: 8px; align-items: center;
     }
-    .speaker-input {
+    .marker-input {
       flex: 1;
-      min-width: 120px;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 8px 12px;
-      color: var(--text);
-      font-size: 14px;
-      outline: none;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 8px 12px;
+      color: var(--text); font-size: 14px; outline: none;
     }
-    .speaker-input:focus { border-color: var(--accent); }
+    .marker-input:focus { border-color: var(--orange); }
     .btn-sm {
-      padding: 8px 14px;
-      border: none;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: opacity 0.15s, transform 0.1s;
+      padding: 8px 14px; border: none; border-radius: 8px;
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      white-space: nowrap; transition: opacity 0.15s, transform 0.1s;
       -webkit-user-select: none;
     }
     .btn-sm:active { opacity: 0.75; transform: scale(0.97); }
-    .btn-accent { background: var(--accent); color: #fff; }
-    .btn-ghost { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
     .btn-orange { background: var(--orange); color: #fff; }
+    .btn-ghost { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
 
-    /* ── FIXED BOTTOM CONTROLS ── */
-    .bottom-controls {
-      position: fixed;
-      bottom: 0;
-      left: 0; right: 0;
-      background: var(--bg);
-      border-top: 1px solid var(--border);
-      padding: 16px 20px calc(16px + env(safe-area-inset-bottom));
-      display: flex;
+    /* ── QUICK SPEAKER BAR ── */
+    .quick-bar {
+      padding: 0 0 2px;
+      display: none;
       flex-direction: column;
-      gap: 10px;
-      z-index: 99;
+      gap: 6px;
     }
-    .controls-row {
-      display: flex;
-      gap: 10px;
-      align-items: center;
+    .quick-bar.visible { display: flex; }
+    .quick-bar-label {
+      font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px;
+      color: var(--text2); font-weight: 600;
     }
-    .btn-record {
-      flex: 1;
-      height: 64px;
-      border: none;
-      border-radius: var(--radius);
-      font-size: 17px;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
+    .quick-bar-btns {
+      display: flex; gap: 8px; flex-wrap: wrap;
+    }
+    .quick-speaker-btn {
+      display: flex; align-items: center; gap: 6px;
+      padding: 10px 14px;
+      background: var(--surface); border: 2px solid;
+      border-radius: 12px;
+      font-size: 14px; font-weight: 700; cursor: pointer;
+      transition: all 0.15s; -webkit-user-select: none;
+      flex: 1; min-width: 100px; max-width: 160px;
       justify-content: center;
-      gap: 10px;
-      transition: all 0.2s;
-      -webkit-user-select: none;
-      letter-spacing: -0.2px;
+    }
+    .quick-speaker-btn:active { transform: scale(0.94); }
+    .quick-speaker-btn.active {
+      color: #fff !important;
+    }
+    .quick-speaker-btn .qs-dot {
+      width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0;
+    }
+    .quick-speaker-btn .qs-initial {
+      font-size: 12px; font-weight: 800; opacity: 0.7;
+    }
+    .quick-none-btn {
+      display: flex; align-items: center; gap: 6px;
+      padding: 10px 14px;
+      background: var(--surface2); border: 2px solid var(--border);
+      border-radius: 12px; color: var(--text2);
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      transition: all 0.15s; -webkit-user-select: none;
+      flex-shrink: 0;
+    }
+    .quick-none-btn.active {
+      border-color: var(--text2); color: var(--text);
+      background: var(--surface);
+    }
+    .quick-none-btn:active { transform: scale(0.94); }
+
+    /* ── FIXED BOTTOM ── */
+    .bottom-controls {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: var(--bg); border-top: 1px solid var(--border);
+      padding: 12px 20px calc(12px + env(safe-area-inset-bottom));
+      display: flex; flex-direction: column; gap: 10px; z-index: 99;
+    }
+    .controls-row { display: flex; gap: 10px; align-items: center; }
+    .btn-record {
+      flex: 1; height: 60px; border: none; border-radius: var(--radius);
+      font-size: 16px; font-weight: 700; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      transition: all 0.2s; -webkit-user-select: none; letter-spacing: -0.2px;
     }
     .btn-record:active { transform: scale(0.97); }
     .btn-record.idle {
-      background: linear-gradient(135deg, var(--accent), #8b5cf6);
-      color: #fff;
+      background: linear-gradient(135deg, var(--accent), #8b5cf6); color: #fff;
       box-shadow: 0 4px 20px rgba(108,99,255,0.4);
     }
     .btn-record.recording {
-      background: linear-gradient(135deg, var(--red), #dc2626);
-      color: #fff;
+      background: linear-gradient(135deg, var(--red), #dc2626); color: #fff;
       box-shadow: 0 4px 20px rgba(248,113,113,0.4);
     }
     .btn-record.paused {
-      background: linear-gradient(135deg, var(--green), #16a34a);
-      color: #fff;
+      background: linear-gradient(135deg, var(--green), #16a34a); color: #fff;
       box-shadow: 0 4px 20px rgba(74,222,128,0.3);
     }
     .btn-side {
-      width: 64px;
-      height: 64px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      background: var(--surface);
-      color: var(--text);
-      font-size: 22px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      transition: all 0.15s;
-      -webkit-user-select: none;
+      width: 60px; height: 60px; border: 1px solid var(--border);
+      border-radius: var(--radius); background: var(--surface); color: var(--text);
+      font-size: 20px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: all 0.15s; -webkit-user-select: none;
     }
     .btn-side:active { opacity: 0.7; transform: scale(0.95); }
     .btn-side.danger { border-color: var(--red); color: var(--red); }
     .btn-generate {
-      width: 100%;
-      height: 52px;
-      border: none;
-      border-radius: var(--radius);
-      background: linear-gradient(135deg, #7c3aed, #4f46e5);
-      color: #fff;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: all 0.15s;
-      -webkit-user-select: none;
+      width: 100%; height: 50px; border: none; border-radius: var(--radius);
+      background: linear-gradient(135deg, #7c3aed, #4f46e5); color: #fff;
+      font-size: 15px; font-weight: 700; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: all 0.15s; -webkit-user-select: none;
       box-shadow: 0 4px 16px rgba(124,58,237,0.35);
     }
     .btn-generate:active { opacity: 0.85; transform: scale(0.98); }
-    .btn-generate:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-      transform: none;
-    }
+    .btn-generate:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
-    /* ── MODAL / SHEET ── */
+    /* ── MODAL ── */
     .overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.7);
-      z-index: 200;
-      display: none;
-      align-items: flex-end;
+      position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+      z-index: 200; display: none; align-items: flex-end;
     }
     .overlay.active { display: flex; }
     .sheet {
-      width: 100%;
-      background: var(--surface);
+      width: 100%; background: var(--surface);
       border-radius: 24px 24px 0 0;
       padding: 20px 20px calc(20px + env(safe-area-inset-bottom));
-      max-height: 85dvh;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      animation: slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      max-height: 85dvh; display: flex; flex-direction: column; gap: 14px;
+      animation: slideUp 0.3s cubic-bezier(0.34,1.56,0.64,1);
     }
     @keyframes slideUp {
       from { transform: translateY(100%); }
       to { transform: translateY(0); }
     }
     .sheet-handle {
-      width: 40px; height: 4px;
-      background: var(--border);
-      border-radius: 2px;
-      margin: 0 auto -4px;
+      width: 40px; height: 4px; background: var(--border);
+      border-radius: 2px; margin: 0 auto -4px;
     }
     .sheet-title { font-size: 18px; font-weight: 700; }
     .sheet-sub { font-size: 13px; color: var(--text2); line-height: 1.5; }
     .prompt-area {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px;
-      font-size: 13px;
-      color: var(--text);
-      line-height: 1.6;
-      max-height: 45dvh;
-      overflow-y: auto;
-      white-space: pre-wrap;
-      word-break: break-word;
-      font-family: 'SF Mono', 'Fira Code', monospace;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px; font-size: 13px; color: var(--text);
+      line-height: 1.6; max-height: 45dvh; overflow-y: auto;
+      white-space: pre-wrap; word-break: break-word;
+      font-family: 'SF Mono','Fira Code',monospace;
     }
     .sheet-actions { display: flex; gap: 10px; }
     .btn-full {
-      flex: 1;
-      height: 52px;
-      border: none;
-      border-radius: var(--radius);
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
+      flex: 1; height: 52px; border: none; border-radius: var(--radius);
+      font-size: 15px; font-weight: 700; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
       transition: all 0.15s;
     }
     .btn-full:active { opacity: 0.8; }
     .btn-copy-prompt { background: var(--accent); color: #fff; }
-    .btn-open-claude { background: linear-gradient(135deg, #7c3aed, #4f46e5); color: #fff; }
+    .btn-open-claude { background: linear-gradient(135deg,#7c3aed,#4f46e5); color: #fff; }
     .btn-close-sheet { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+
+    /* ── TOAST ── */
     .copy-toast {
-      position: fixed;
-      bottom: 160px;
-      left: 50%;
+      position: fixed; bottom: 220px; left: 50%;
       transform: translateX(-50%) translateY(20px);
-      background: var(--green);
-      color: #0f0f0f;
-      font-weight: 700;
-      font-size: 14px;
-      padding: 10px 22px;
-      border-radius: 20px;
-      opacity: 0;
-      transition: all 0.3s;
-      pointer-events: none;
-      z-index: 300;
-      white-space: nowrap;
+      background: var(--green); color: #0f0f0f;
+      font-weight: 700; font-size: 14px; padding: 10px 22px;
+      border-radius: 20px; opacity: 0; transition: all 0.3s;
+      pointer-events: none; z-index: 300; white-space: nowrap;
     }
     .copy-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-    /* ── iOS warning ── */
+    /* ── iOS hint ── */
     .ios-hint {
       display: none;
-      background: rgba(251,146,60,0.12);
-      border: 1px solid rgba(251,146,60,0.3);
-      border-radius: 10px;
-      padding: 10px 14px;
-      font-size: 13px;
-      color: var(--orange);
-      line-height: 1.5;
+      background: rgba(251,146,60,0.12); border: 1px solid rgba(251,146,60,0.3);
+      border-radius: 10px; padding: 10px 14px; font-size: 13px;
+      color: var(--orange); line-height: 1.5;
     }
 
-    /* ── scrollbar ── */
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
@@ -470,14 +411,13 @@
 <!-- MAIN -->
 <main>
 
-  <!-- iOS hint -->
   <div class="ios-hint" id="iosHint">
-    ℹ️ Sur iPhone/Safari, la transcription s'arrête après chaque phrase et redémarre automatiquement. Parlez clairement et attendez 1–2 sec entre les phrases.
+    ℹ️ Sur iPhone/Safari, la transcription s'arrête après chaque phrase et redémarre automatiquement.
   </div>
 
   <!-- AG Info -->
-  <div class="info-card">
-    <div class="info-card-title">Informations de l'AG</div>
+  <div class="card">
+    <div class="card-title">Informations de l'AG</div>
     <div class="info-grid">
       <div class="info-field">
         <label>📅 Date</label>
@@ -498,6 +438,25 @@
     </div>
   </div>
 
+  <!-- Participants -->
+  <div class="card">
+    <div class="card-title">👥 Participants</div>
+    <div class="speaker-chips" id="speakerChips">
+      <!-- rendered by JS -->
+    </div>
+    <div class="add-speaker-row">
+      <input
+        class="add-speaker-input"
+        type="text"
+        id="newSpeakerInput"
+        placeholder="Nom (ex: M. Dupont, Syndic, Mme Martin…)"
+        autocomplete="off"
+        autocorrect="off"
+      />
+      <button class="btn-add-speaker" onclick="addSpeakerFromInput()">＋ Ajouter</button>
+    </div>
+  </div>
+
   <!-- Transcript -->
   <div class="transcript-card">
     <div class="transcript-header">
@@ -505,16 +464,14 @@
       <span class="word-count" id="wordCount">0 mots</span>
     </div>
     <div class="transcript-body" id="transcriptBody"></div>
-    <div class="speaker-toolbar">
+    <div class="marker-toolbar">
       <input
-        class="speaker-input"
+        class="marker-input"
         type="text"
-        id="speakerInput"
-        placeholder="Intervenant (ex: M. Dupont)"
+        id="markerInput"
+        placeholder="Repère (ex: Point 3 - Ravalement)"
         autocomplete="off"
-        autocorrect="off"
       />
-      <button class="btn-sm btn-accent" onclick="setSpeaker()">👤 Définir</button>
       <button class="btn-sm btn-orange" onclick="addMarker()">📌 Repère</button>
       <button class="btn-sm btn-ghost" onclick="clearTranscript()">🗑️</button>
     </div>
@@ -524,14 +481,22 @@
 
 <!-- BOTTOM CONTROLS -->
 <div class="bottom-controls">
+
+  <!-- Quick speaker bar (visible during recording) -->
+  <div class="quick-bar" id="quickBar">
+    <div class="quick-bar-label">Qui parle ?</div>
+    <div class="quick-bar-btns" id="quickBarBtns"></div>
+  </div>
+
   <div class="controls-row">
     <button class="btn-side" id="btnPause" onclick="togglePause()" title="Pause" style="display:none">⏸</button>
     <button class="btn-record idle" id="btnRecord" onclick="toggleRecord()">
       <span id="btnRecordIcon">🎙️</span>
       <span id="btnRecordLabel">Démarrer l'enregistrement</span>
     </button>
-    <button class="btn-side danger" onclick="stopAndReset()" title="Arrêter et réinitialiser">⏹</button>
+    <button class="btn-side danger" onclick="stopAndReset()" title="Réinitialiser">⏹</button>
   </div>
+
   <button class="btn-generate" id="btnGenerate" onclick="openSheet()" disabled>
     ✨ Préparer le compte rendu avec Claude
   </button>
@@ -542,7 +507,7 @@
   <div class="sheet">
     <div class="sheet-handle"></div>
     <div class="sheet-title">✨ Compte rendu pour Claude</div>
-    <div class="sheet-sub">Copiez ce texte, puis collez-le sur <strong>claude.ai</strong> pour générer le compte rendu officiel.</div>
+    <div class="sheet-sub">Copiez ce texte puis collez-le sur <strong>claude.ai</strong> pour générer le compte rendu officiel.</div>
     <div class="prompt-area" id="promptArea"></div>
     <div class="sheet-actions">
       <button class="btn-full btn-copy-prompt" onclick="copyPrompt()">📋 Copier</button>
@@ -554,10 +519,18 @@
   </div>
 </div>
 
-<!-- TOAST -->
-<div class="copy-toast" id="toast">✅ Copié !</div>
+<div class="copy-toast" id="toast"></div>
 
 <script>
+// ─────────────────────────────────────────────
+// SPEAKER COLORS
+// ─────────────────────────────────────────────
+const COLORS = [
+  '#6c63ff','#f87171','#4ade80','#fb923c',
+  '#38bdf8','#e879f9','#facc15','#2dd4bf',
+  '#f472b6','#a78bfa','#86efac','#fca5a5',
+];
+
 // ─────────────────────────────────────────────
 // STATE
 // ─────────────────────────────────────────────
@@ -566,8 +539,9 @@ let isRecording = false;
 let isPaused = false;
 let timerInterval = null;
 let elapsedSeconds = 0;
-let currentSpeaker = '';
-let segments = [];          // { type, speaker, text, time }
+let currentSpeaker = '';       // name string, '' = no speaker
+let speakers = [];             // [{ name, color }]
+let segments = [];             // [{ type, speaker, speakerColor, text, time }]
 let interimDiv = null;
 let isIOS = false;
 let restartTimeout = null;
@@ -576,25 +550,123 @@ let restartTimeout = null;
 // INIT
 // ─────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-  // Pre-fill date & time
   const now = new Date();
   document.getElementById('agDate').value = now.toISOString().split('T')[0];
-  document.getElementById('agTime').value = now.toTimeString().slice(0,5);
+  document.getElementById('agTime').value = now.toTimeString().slice(0, 5);
 
-  // Detect iOS
   isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
   if (isIOS) document.getElementById('iosHint').style.display = 'block';
 
-  // Restore from localStorage
   restoreSession();
 
-  // Speech Recognition check
   if (!('SpeechRecognition' in window) && !('webkitSpeechRecognition' in window)) {
-    setStatus('⚠️ Votre navigateur ne supporte pas la transcription. Utilisez Chrome ou Safari.', '');
+    setStatus('⚠️ Utilisez Chrome (Android) ou Safari (iOS 14.5+)', '');
   } else {
     setStatus('Prêt à enregistrer', 'ready');
   }
+
+  // Enter key on new speaker input
+  document.getElementById('newSpeakerInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') addSpeakerFromInput();
+  });
 });
+
+// ─────────────────────────────────────────────
+// SPEAKER MANAGEMENT
+// ─────────────────────────────────────────────
+function addSpeakerFromInput() {
+  const input = document.getElementById('newSpeakerInput');
+  const name = input.value.trim();
+  if (!name) return;
+  if (speakers.find(s => s.name.toLowerCase() === name.toLowerCase())) {
+    showToast('Ce participant existe déjà');
+    return;
+  }
+  const color = COLORS[speakers.length % COLORS.length];
+  speakers.push({ name, color });
+  input.value = '';
+  renderSpeakerChips();
+  renderQuickBar();
+  saveSession();
+}
+
+function removeSpeaker(idx) {
+  const name = speakers[idx].name;
+  speakers.splice(idx, 1);
+  if (currentSpeaker === name) {
+    currentSpeaker = '';
+  }
+  renderSpeakerChips();
+  renderQuickBar();
+  saveSession();
+}
+
+function renderSpeakerChips() {
+  const container = document.getElementById('speakerChips');
+  container.innerHTML = '';
+  if (speakers.length === 0) return;
+  speakers.forEach((sp, idx) => {
+    const chip = document.createElement('div');
+    chip.className = 'speaker-chip';
+    chip.style.borderColor = sp.color;
+    chip.style.color = sp.color;
+    chip.innerHTML = `
+      <span class="chip-dot" style="background:${sp.color}"></span>
+      <span>${escHtml(sp.name)}</span>
+      <button class="chip-remove" onclick="removeSpeaker(${idx})" title="Supprimer">×</button>
+    `;
+    container.appendChild(chip);
+  });
+}
+
+function renderQuickBar() {
+  const bar = document.getElementById('quickBar');
+  const btns = document.getElementById('quickBarBtns');
+  btns.innerHTML = '';
+
+  if (!isRecording || speakers.length === 0) {
+    bar.classList.remove('visible');
+    return;
+  }
+  bar.classList.add('visible');
+
+  // "Aucun" button
+  const noneBtn = document.createElement('button');
+  noneBtn.className = 'quick-none-btn' + (currentSpeaker === '' ? ' active' : '');
+  noneBtn.textContent = '—';
+  noneBtn.title = 'Aucun intervenant défini';
+  noneBtn.onclick = () => activateSpeaker('');
+  btns.appendChild(noneBtn);
+
+  speakers.forEach(sp => {
+    const btn = document.createElement('button');
+    const isActive = currentSpeaker === sp.name;
+    btn.className = 'quick-speaker-btn' + (isActive ? ' active' : '');
+    btn.style.borderColor = sp.color;
+    btn.style.color = isActive ? '#fff' : sp.color;
+    if (isActive) btn.style.background = sp.color;
+    else btn.style.background = 'var(--surface)';
+
+    const dot = document.createElement('span');
+    dot.className = 'qs-dot';
+    dot.style.background = isActive ? 'rgba(255,255,255,0.7)' : sp.color;
+
+    const label = document.createElement('span');
+    label.textContent = sp.name;
+
+    btn.appendChild(dot);
+    btn.appendChild(label);
+    btn.onclick = () => activateSpeaker(sp.name);
+    btns.appendChild(btn);
+  });
+}
+
+function activateSpeaker(name) {
+  currentSpeaker = name;
+  renderQuickBar();
+  if (name) showToast(`🎙 ${name}`);
+  else showToast('— Aucun intervenant');
+}
 
 // ─────────────────────────────────────────────
 // SPEECH RECOGNITION
@@ -603,7 +675,7 @@ function buildRecognition() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   const r = new SR();
   r.lang = 'fr-FR';
-  r.continuous = !isIOS;   // iOS doesn't support continuous well
+  r.continuous = !isIOS;
   r.interimResults = true;
   r.maxAlternatives = 1;
 
@@ -657,7 +729,7 @@ function toggleRecord() {
 
 function startRecording() {
   if (!('SpeechRecognition' in window) && !('webkitSpeechRecognition' in window)) {
-    alert('La transcription automatique n\'est pas disponible sur ce navigateur.\nUtilisez Chrome (Android) ou Safari (iOS 14.5+).');
+    alert('La transcription n\'est pas disponible.\nUtilisez Chrome (Android) ou Safari (iOS 14.5+).');
     return;
   }
   isRecording = true;
@@ -669,6 +741,7 @@ function startRecording() {
   updateUI();
   setStatus('Enregistrement en cours…', 'recording');
   document.getElementById('btnPause').style.display = 'flex';
+  renderQuickBar();
 }
 
 function stopRecording() {
@@ -683,6 +756,7 @@ function stopRecording() {
   removeInterim();
   saveSession();
   updateGenerateButton();
+  renderQuickBar(); // hide bar
 }
 
 function togglePause() {
@@ -695,6 +769,7 @@ function togglePause() {
     updateUI();
     setStatus('En pause', 'paused');
     document.getElementById('btnPause').textContent = '▶️';
+    renderQuickBar();
   } else {
     isPaused = false;
     recognition = buildRecognition();
@@ -703,6 +778,7 @@ function togglePause() {
     updateUI();
     setStatus('Enregistrement en cours…', 'recording');
     document.getElementById('btnPause').textContent = '⏸';
+    renderQuickBar();
   }
 }
 
@@ -711,6 +787,7 @@ function stopAndReset() {
   stopRecording();
   segments = [];
   elapsedSeconds = 0;
+  currentSpeaker = '';
   document.getElementById('timer').textContent = '00:00';
   document.getElementById('transcriptBody').innerHTML = '';
   updateWordCount();
@@ -740,19 +817,19 @@ function formatTime(s) {
 // TRANSCRIPT
 // ─────────────────────────────────────────────
 function addSegment(text) {
+  const sp = speakers.find(s => s.name === currentSpeaker);
   const seg = {
     type: 'speech',
     speaker: currentSpeaker,
+    speakerColor: sp ? sp.color : null,
     text,
-    time: formatTime(elapsedSeconds)
+    time: formatTime(elapsedSeconds),
   };
   segments.push(seg);
   renderSegment(seg);
   updateWordCount();
   updateGenerateButton();
   saveSession();
-
-  // Auto-scroll
   const body = document.getElementById('transcriptBody');
   body.scrollTop = body.scrollHeight;
 }
@@ -760,18 +837,23 @@ function addSegment(text) {
 function renderSegment(seg) {
   const body = document.getElementById('transcriptBody');
   removeInterim();
-
   const div = document.createElement('div');
+
   if (seg.type === 'marker') {
     div.className = 'segment marker';
     div.textContent = `📌 ${seg.text}`;
   } else {
     div.className = 'segment';
+    const color = seg.speakerColor || 'var(--accent)';
+    div.style.borderLeftColor = color;
+
     const meta = document.createElement('div');
     meta.className = 'segment-meta';
+
     if (seg.speaker) {
       const spEl = document.createElement('span');
       spEl.className = 'segment-speaker';
+      spEl.style.color = color;
       spEl.textContent = seg.speaker;
       meta.appendChild(spEl);
     }
@@ -779,6 +861,7 @@ function renderSegment(seg) {
     timeEl.textContent = seg.time;
     meta.appendChild(timeEl);
     div.appendChild(meta);
+
     const textEl = document.createElement('div');
     textEl.textContent = seg.text;
     div.appendChild(textEl);
@@ -790,30 +873,24 @@ function showInterim(text) {
   const body = document.getElementById('transcriptBody');
   removeInterim();
   if (!text.trim()) return;
+
+  // Color interim based on active speaker
+  const sp = speakers.find(s => s.name === currentSpeaker);
   interimDiv = document.createElement('div');
   interimDiv.className = 'interim-text';
+  if (sp) interimDiv.style.color = sp.color;
   interimDiv.textContent = text + '…';
   body.appendChild(interimDiv);
   body.scrollTop = body.scrollHeight;
 }
 
 function removeInterim() {
-  if (interimDiv && interimDiv.parentNode) {
-    interimDiv.parentNode.removeChild(interimDiv);
-  }
+  if (interimDiv && interimDiv.parentNode) interimDiv.parentNode.removeChild(interimDiv);
   interimDiv = null;
 }
 
-function setSpeaker() {
-  const val = document.getElementById('speakerInput').value.trim();
-  currentSpeaker = val;
-  if (val) {
-    showToast(`👤 Intervenant : ${val}`);
-  }
-}
-
 function addMarker() {
-  const input = document.getElementById('speakerInput');
+  const input = document.getElementById('markerInput');
   const label = input.value.trim() || prompt('Texte du repère (ex: Point 3 - Ravalement)');
   if (!label) return;
   const seg = { type: 'marker', text: label, time: formatTime(elapsedSeconds) };
@@ -836,10 +913,8 @@ function clearTranscript() {
 function updateWordCount() {
   const words = segments
     .filter(s => s.type === 'speech')
-    .map(s => s.text)
-    .join(' ')
-    .split(/\s+/)
-    .filter(Boolean).length;
+    .map(s => s.text).join(' ')
+    .split(/\s+/).filter(Boolean).length;
   document.getElementById('wordCount').textContent = `${words} mot${words !== 1 ? 's' : ''}`;
 }
 
@@ -854,13 +929,11 @@ function updateUI() {
 
   if (isRecording && !isPaused) {
     btn.className = 'btn-record recording';
-    icon.textContent = '⏹';
-    label.textContent = 'Arrêter l\'enregistrement';
+    icon.textContent = '⏹'; label.textContent = 'Arrêter l\'enregistrement';
     timer.className = 'timer-pill recording';
   } else if (isRecording && isPaused) {
     btn.className = 'btn-record paused';
-    icon.textContent = '▶️';
-    label.textContent = 'Reprendre l\'enregistrement';
+    icon.textContent = '▶️'; label.textContent = 'Reprendre l\'enregistrement';
     timer.className = 'timer-pill paused';
   } else {
     btn.className = 'btn-record idle';
@@ -871,15 +944,13 @@ function updateUI() {
 }
 
 function updateGenerateButton() {
-  const btn = document.getElementById('btnGenerate');
-  const hasContent = segments.filter(s => s.type === 'speech').length > 0;
-  btn.disabled = !hasContent;
+  document.getElementById('btnGenerate').disabled =
+    segments.filter(s => s.type === 'speech').length === 0;
 }
 
 function setStatus(text, state) {
   document.getElementById('statusText').textContent = text;
-  const dot = document.getElementById('statusDot');
-  dot.className = 'status-dot' + (state ? ` ${state}` : '');
+  document.getElementById('statusDot').className = 'status-dot' + (state ? ` ${state}` : '');
 }
 
 // ─────────────────────────────────────────────
@@ -890,6 +961,7 @@ function buildPrompt() {
   const time = document.getElementById('agTime').value || '(non renseignée)';
   const address = document.getElementById('agAddress').value.trim() || '(non renseignée)';
   const syndic = document.getElementById('agSyndic').value.trim() || '(non renseigné)';
+  const participantsList = speakers.map(s => `- ${s.name}`).join('\n') || '(non renseignés)';
 
   const transcriptText = segments.map(seg => {
     if (seg.type === 'marker') return `\n=== ${seg.text} ===\n`;
@@ -907,6 +979,10 @@ Résidence : ${address}
 Syndic / Président : ${syndic}
 Durée enregistrée : ${formatTime(elapsedSeconds)}
 
+PARTICIPANTS IDENTIFIÉS
+────────────────────────
+${participantsList}
+
 TRANSCRIPTION BRUTE
 ────────────────────
 ${transcriptText}
@@ -916,29 +992,25 @@ MISSION
 Génère un compte rendu officiel d'AG de copropriété structuré ainsi :
 
 1. En-tête officiel (résidence, date, heure, lieu)
-2. Présences et représentations (déduis des noms mentionnés dans la transcription)
+2. Présences et représentations
 3. Bureau de séance (président, secrétaire, scrutateurs)
 4. Pour chaque point à l'ordre du jour :
    - Numéro et intitulé
-   - Synthèse des discussions (points clés)
+   - Synthèse des discussions (points clés, positions des intervenants)
    - Résolution proposée
    - Vote : POUR ___ / CONTRE ___ / ABSTENTION ___
    - Décision : ADOPTÉE / REJETÉE
 5. Questions diverses
-6. Date de clôture
+6. Clôture de séance
 
-Utilise un style formel et juridiquement correct. Si des informations manquent dans la transcription, indique-le clairement entre [crochets].`;
+Utilise un style formel et juridiquement correct. Si des informations manquent, indique-le entre [crochets].`;
 }
 
 function openSheet() {
   document.getElementById('promptArea').textContent = buildPrompt();
   document.getElementById('overlay').classList.add('active');
 }
-
-function closeSheet() {
-  document.getElementById('overlay').classList.remove('active');
-}
-
+function closeSheet() { document.getElementById('overlay').classList.remove('active'); }
 function closeSheetOnOutside(e) {
   if (e.target === document.getElementById('overlay')) closeSheet();
 }
@@ -948,24 +1020,17 @@ function copyPrompt() {
   navigator.clipboard.writeText(text).then(() => {
     showToast('✅ Copié dans le presse-papiers !');
   }).catch(() => {
-    // Fallback
     const ta = document.createElement('textarea');
-    ta.value = text;
-    ta.style.position = 'fixed';
-    ta.style.opacity = '0';
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand('copy');
-    document.body.removeChild(ta);
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
     showToast('✅ Copié !');
   });
 }
 
 function openClaude() {
   copyPrompt();
-  setTimeout(() => {
-    window.open('https://claude.ai', '_blank');
-  }, 400);
+  setTimeout(() => window.open('https://claude.ai', '_blank'), 400);
 }
 
 // ─────────────────────────────────────────────
@@ -974,10 +1039,16 @@ function openClaude() {
 let toastTimeout;
 function showToast(msg) {
   const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
+  t.textContent = msg; t.classList.add('show');
   clearTimeout(toastTimeout);
-  toastTimeout = setTimeout(() => t.classList.remove('show'), 2500);
+  toastTimeout = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ─────────────────────────────────────────────
+// UTILS
+// ─────────────────────────────────────────────
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 // ─────────────────────────────────────────────
@@ -986,6 +1057,7 @@ function showToast(msg) {
 function saveSession() {
   try {
     localStorage.setItem('ag_segments', JSON.stringify(segments));
+    localStorage.setItem('ag_speakers', JSON.stringify(speakers));
     localStorage.setItem('ag_elapsed', elapsedSeconds);
     localStorage.setItem('ag_date', document.getElementById('agDate').value);
     localStorage.setItem('ag_time', document.getElementById('agTime').value);
@@ -996,6 +1068,11 @@ function saveSession() {
 
 function restoreSession() {
   try {
+    const savedSpeakers = localStorage.getItem('ag_speakers');
+    if (savedSpeakers) {
+      speakers = JSON.parse(savedSpeakers);
+      renderSpeakerChips();
+    }
     const savedSegments = localStorage.getItem('ag_segments');
     if (savedSegments) {
       segments = JSON.parse(savedSegments);
@@ -1010,22 +1087,18 @@ function restoreSession() {
       elapsedSeconds = parseInt(elapsed, 10);
       document.getElementById('timer').textContent = formatTime(elapsedSeconds);
     }
-    const fields = ['ag_date', 'ag_time', 'ag_address', 'ag_syndic'];
-    const ids = ['agDate', 'agTime', 'agAddress', 'agSyndic'];
-    fields.forEach((key, i) => {
+    ['ag_date','ag_time','ag_address','ag_syndic'].forEach((key, i) => {
       const val = localStorage.getItem(key);
-      if (val) document.getElementById(ids[i]).value = val;
+      if (val) document.getElementById(['agDate','agTime','agAddress','agSyndic'][i]).value = val;
     });
   } catch(e) {}
 }
 
 function clearLocalStorage() {
-  ['ag_segments','ag_elapsed','ag_date','ag_time','ag_address','ag_syndic'].forEach(k => {
-    try { localStorage.removeItem(k); } catch(e) {}
-  });
+  ['ag_segments','ag_speakers','ag_elapsed','ag_date','ag_time','ag_address','ag_syndic']
+    .forEach(k => { try { localStorage.removeItem(k); } catch(e) {} });
 }
 
-// Auto-save on info fields change
 ['agDate','agTime','agAddress','agSyndic'].forEach(id => {
   document.getElementById(id).addEventListener('change', saveSession);
 });
