@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#1a1a2e" />
+  <title>AG Copropriété — Enregistreur</title>
+  <style>
+    :root {
+      --bg: #0f0f1a;
+      --surface: #1a1a2e;
+      --surface2: #22223b;
+      --accent: #6c63ff;
+      --accent2: #ff6584;
+      --green: #4ade80;
+      --red: #f87171;
+      --orange: #fb923c;
+      --text: #f0f0f8;
+      --text2: #9090b0;
+      --border: rgba(255,255,255,0.08);
+      --radius: 16px;
+      --shadow: 0 4px 24px rgba(0,0,0,0.4);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 20px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(12px);
+    }
+    .logo { display: flex; align-items: center; gap: 10px; }
+    .logo-icon {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .logo-text { font-size: 15px; font-weight: 700; letter-spacing: -0.3px; }
+    .logo-sub { font-size: 11px; color: var(--text2); margin-top: 1px; }
+    .timer-pill {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 18px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 1px;
+      color: var(--text);
+      min-width: 88px;
+      text-align: center;
+    }
+    .timer-pill.recording { color: var(--red); border-color: var(--red); }
+    .timer-pill.paused { color: var(--orange); border-color: var(--orange); }
+
+    /* ── STATUS BAR ── */
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--text2);
+      min-height: 40px;
+    }
+    .status-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--text2);
+      flex-shrink: 0;
+    }
+    .status-dot.recording { background: var(--red); animation: pulse 1s infinite; }
+    .status-dot.paused { background: var(--orange); }
+    .status-dot.ready { background: var(--green); }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.8); }
+    }
+
+    /* ── MAIN CONTENT ── */
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 16px;
+      gap: 14px;
+      overflow-y: auto;
+      padding-bottom: 200px;
+    }
+
+    /* ── AG INFO CARD ── */
+    .info-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+    }
+    .info-card-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text2);
+      margin-bottom: 10px;
+    }
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .info-field label {
+      display: block;
+      font-size: 11px;
+      color: var(--text2);
+      margin-bottom: 4px;
+    }
+    .info-field input {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 10px;
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .info-field input:focus { border-color: var(--accent); }
+    .info-field.full { grid-column: 1 / -1; }
+
+    /* ── TRANSCRIPT ── */
+    .transcript-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    .transcript-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .transcript-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text2);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+    .word-count { font-size: 12px; color: var(--text2); }
+    .transcript-body {
+      padding: 14px 16px;
+      min-height: 220px;
+      max-height: 45vh;
+      overflow-y: auto;
+      font-size: 15px;
+      line-height: 1.7;
+      color: var(--text);
+    }
+    .transcript-body:empty::before {
+      content: "La transcription apparaîtra ici dès que vous commencerez à parler…";
+      color: var(--text2);
+      font-style: italic;
+    }
+    .segment {
+      margin-bottom: 10px;
+      padding: 8px 10px;
+      background: var(--surface2);
+      border-radius: 8px;
+      border-left: 3px solid var(--accent);
+    }
+    .segment.marker {
+      border-left-color: var(--orange);
+      background: rgba(251,146,60,0.08);
+      font-weight: 600;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .segment-meta {
+      font-size: 11px;
+      color: var(--text2);
+      margin-bottom: 3px;
+      display: flex;
+      gap: 8px;
+    }
+    .segment-speaker { color: var(--accent); font-weight: 600; }
+    .interim-text {
+      color: var(--text2);
+      font-style: italic;
+      padding: 6px 10px;
+      font-size: 14px;
+    }
+
+    /* ── SPEAKER TOOLBAR ── */
+    .speaker-toolbar {
+      padding: 10px 16px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .speaker-input {
+      flex: 1;
+      min-width: 120px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px;
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+    }
+    .speaker-input:focus { border-color: var(--accent); }
+    .btn-sm {
+      padding: 8px 14px;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: opacity 0.15s, transform 0.1s;
+      -webkit-user-select: none;
+    }
+    .btn-sm:active { opacity: 0.75; transform: scale(0.97); }
+    .btn-accent { background: var(--accent); color: #fff; }
+    .btn-ghost { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+    .btn-orange { background: var(--orange); color: #fff; }
+
+    /* ── FIXED BOTTOM CONTROLS ── */
+    .bottom-controls {
+      position: fixed;
+      bottom: 0;
+      left: 0; right: 0;
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      padding: 16px 20px calc(16px + env(safe-area-inset-bottom));
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 99;
+    }
+    .controls-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .btn-record {
+      flex: 1;
+      height: 64px;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.2s;
+      -webkit-user-select: none;
+      letter-spacing: -0.2px;
+    }
+    .btn-record:active { transform: scale(0.97); }
+    .btn-record.idle {
+      background: linear-gradient(135deg, var(--accent), #8b5cf6);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(108,99,255,0.4);
+    }
+    .btn-record.recording {
+      background: linear-gradient(135deg, var(--red), #dc2626);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(248,113,113,0.4);
+    }
+    .btn-record.paused {
+      background: linear-gradient(135deg, var(--green), #16a34a);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(74,222,128,0.3);
+    }
+    .btn-side {
+      width: 64px;
+      height: 64px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--text);
+      font-size: 22px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.15s;
+      -webkit-user-select: none;
+    }
+    .btn-side:active { opacity: 0.7; transform: scale(0.95); }
+    .btn-side.danger { border-color: var(--red); color: var(--red); }
+    .btn-generate {
+      width: 100%;
+      height: 52px;
+      border: none;
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, #7c3aed, #4f46e5);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.15s;
+      -webkit-user-select: none;
+      box-shadow: 0 4px 16px rgba(124,58,237,0.35);
+    }
+    .btn-generate:active { opacity: 0.85; transform: scale(0.98); }
+    .btn-generate:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* ── MODAL / SHEET ── */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 200;
+      display: none;
+      align-items: flex-end;
+    }
+    .overlay.active { display: flex; }
+    .sheet {
+      width: 100%;
+      background: var(--surface);
+      border-radius: 24px 24px 0 0;
+      padding: 20px 20px calc(20px + env(safe-area-inset-bottom));
+      max-height: 85dvh;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      animation: slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+    .sheet-handle {
+      width: 40px; height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      margin: 0 auto -4px;
+    }
+    .sheet-title { font-size: 18px; font-weight: 700; }
+    .sheet-sub { font-size: 13px; color: var(--text2); line-height: 1.5; }
+    .prompt-area {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.6;
+      max-height: 45dvh;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+    }
+    .sheet-actions { display: flex; gap: 10px; }
+    .btn-full {
+      flex: 1;
+      height: 52px;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.15s;
+    }
+    .btn-full:active { opacity: 0.8; }
+    .btn-copy-prompt { background: var(--accent); color: #fff; }
+    .btn-open-claude { background: linear-gradient(135deg, #7c3aed, #4f46e5); color: #fff; }
+    .btn-close-sheet { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+    .copy-toast {
+      position: fixed;
+      bottom: 160px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--green);
+      color: #0f0f0f;
+      font-weight: 700;
+      font-size: 14px;
+      padding: 10px 22px;
+      border-radius: 20px;
+      opacity: 0;
+      transition: all 0.3s;
+      pointer-events: none;
+      z-index: 300;
+      white-space: nowrap;
+    }
+    .copy-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── iOS warning ── */
+    .ios-hint {
+      display: none;
+      background: rgba(251,146,60,0.12);
+      border: 1px solid rgba(251,146,60,0.3);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 13px;
+      color: var(--orange);
+      line-height: 1.5;
+    }
+
+    /* ── scrollbar ── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">
+    <div class="logo-icon">🏢</div>
+    <div>
+      <div class="logo-text">AG Copropriété</div>
+      <div class="logo-sub">Enregistreur & Transcription</div>
+    </div>
+  </div>
+  <div class="timer-pill" id="timer">00:00</div>
+</header>
+
+<!-- STATUS -->
+<div class="status-bar">
+  <div class="status-dot" id="statusDot"></div>
+  <span id="statusText">Prêt à enregistrer</span>
+</div>
+
+<!-- MAIN -->
+<main>
+
+  <!-- iOS hint -->
+  <div class="ios-hint" id="iosHint">
+    ℹ️ Sur iPhone/Safari, la transcription s'arrête après chaque phrase et redémarre automatiquement. Parlez clairement et attendez 1–2 sec entre les phrases.
+  </div>
+
+  <!-- AG Info -->
+  <div class="info-card">
+    <div class="info-card-title">Informations de l'AG</div>
+    <div class="info-grid">
+      <div class="info-field">
+        <label>📅 Date</label>
+        <input type="date" id="agDate" />
+      </div>
+      <div class="info-field">
+        <label>🕐 Heure</label>
+        <input type="time" id="agTime" />
+      </div>
+      <div class="info-field full">
+        <label>🏠 Résidence / Adresse</label>
+        <input type="text" id="agAddress" placeholder="Ex: Résidence Les Lilas, 12 rue du Moulin…" />
+      </div>
+      <div class="info-field full">
+        <label>👤 Syndic / Président de séance</label>
+        <input type="text" id="agSyndic" placeholder="Nom du syndic ou président" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Transcript -->
+  <div class="transcript-card">
+    <div class="transcript-header">
+      <span class="transcript-title">Transcription</span>
+      <span class="word-count" id="wordCount">0 mots</span>
+    </div>
+    <div class="transcript-body" id="transcriptBody"></div>
+    <div class="speaker-toolbar">
+      <input
+        class="speaker-input"
+        type="text"
+        id="speakerInput"
+        placeholder="Intervenant (ex: M. Dupont)"
+        autocomplete="off"
+        autocorrect="off"
+      />
+      <button class="btn-sm btn-accent" onclick="setSpeaker()">👤 Définir</button>
+      <button class="btn-sm btn-orange" onclick="addMarker()">📌 Repère</button>
+      <button class="btn-sm btn-ghost" onclick="clearTranscript()">🗑️</button>
+    </div>
+  </div>
+
+</main>
+
+<!-- BOTTOM CONTROLS -->
+<div class="bottom-controls">
+  <div class="controls-row">
+    <button class="btn-side" id="btnPause" onclick="togglePause()" title="Pause" style="display:none">⏸</button>
+    <button class="btn-record idle" id="btnRecord" onclick="toggleRecord()">
+      <span id="btnRecordIcon">🎙️</span>
+      <span id="btnRecordLabel">Démarrer l'enregistrement</span>
+    </button>
+    <button class="btn-side danger" onclick="stopAndReset()" title="Arrêter et réinitialiser">⏹</button>
+  </div>
+  <button class="btn-generate" id="btnGenerate" onclick="openSheet()" disabled>
+    ✨ Préparer le compte rendu avec Claude
+  </button>
+</div>
+
+<!-- MODAL SHEET -->
+<div class="overlay" id="overlay" onclick="closeSheetOnOutside(event)">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">✨ Compte rendu pour Claude</div>
+    <div class="sheet-sub">Copiez ce texte, puis collez-le sur <strong>claude.ai</strong> pour générer le compte rendu officiel.</div>
+    <div class="prompt-area" id="promptArea"></div>
+    <div class="sheet-actions">
+      <button class="btn-full btn-copy-prompt" onclick="copyPrompt()">📋 Copier</button>
+      <button class="btn-full btn-close-sheet" onclick="closeSheet()">Fermer</button>
+    </div>
+    <button class="btn-full btn-open-claude" onclick="openClaude()" style="margin-top:-4px">
+      🤖 Ouvrir Claude.ai
+    </button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="copy-toast" id="toast">✅ Copié !</div>
+
+<script>
+// ─────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────
+let recognition = null;
+let isRecording = false;
+let isPaused = false;
+let timerInterval = null;
+let elapsedSeconds = 0;
+let currentSpeaker = '';
+let segments = [];          // { type, speaker, text, time }
+let interimDiv = null;
+let isIOS = false;
+let restartTimeout = null;
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  // Pre-fill date & time
+  const now = new Date();
+  document.getElementById('agDate').value = now.toISOString().split('T')[0];
+  document.getElementById('agTime').value = now.toTimeString().slice(0,5);
+
+  // Detect iOS
+  isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  if (isIOS) document.getElementById('iosHint').style.display = 'block';
+
+  // Restore from localStorage
+  restoreSession();
+
+  // Speech Recognition check
+  if (!('SpeechRecognition' in window) && !('webkitSpeechRecognition' in window)) {
+    setStatus('⚠️ Votre navigateur ne supporte pas la transcription. Utilisez Chrome ou Safari.', '');
+  } else {
+    setStatus('Prêt à enregistrer', 'ready');
+  }
+});
+
+// ─────────────────────────────────────────────
+// SPEECH RECOGNITION
+// ─────────────────────────────────────────────
+function buildRecognition() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const r = new SR();
+  r.lang = 'fr-FR';
+  r.continuous = !isIOS;   // iOS doesn't support continuous well
+  r.interimResults = true;
+  r.maxAlternatives = 1;
+
+  r.onresult = (event) => {
+    let interim = '';
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const result = event.results[i];
+      if (result.isFinal) {
+        const text = result[0].transcript.trim();
+        if (text) addSegment(text);
+        interim = '';
+      } else {
+        interim += result[0].transcript;
+      }
+    }
+    showInterim(interim);
+  };
+
+  r.onerror = (e) => {
+    if (e.error === 'no-speech') {
+      if (isRecording && !isPaused) scheduleRestart();
+    } else if (e.error === 'not-allowed') {
+      setStatus('❌ Micro refusé — autorisez l\'accès dans les réglages', '');
+      stopRecording();
+    }
+  };
+
+  r.onend = () => {
+    if (isRecording && !isPaused) scheduleRestart();
+  };
+
+  return r;
+}
+
+function scheduleRestart() {
+  clearTimeout(restartTimeout);
+  restartTimeout = setTimeout(() => {
+    if (isRecording && !isPaused && recognition) {
+      try { recognition.start(); } catch(e) {}
+    }
+  }, 300);
+}
+
+// ─────────────────────────────────────────────
+// RECORD CONTROLS
+// ─────────────────────────────────────────────
+function toggleRecord() {
+  if (!isRecording) startRecording();
+  else stopRecording();
+}
+
+function startRecording() {
+  if (!('SpeechRecognition' in window) && !('webkitSpeechRecognition' in window)) {
+    alert('La transcription automatique n\'est pas disponible sur ce navigateur.\nUtilisez Chrome (Android) ou Safari (iOS 14.5+).');
+    return;
+  }
+  isRecording = true;
+  isPaused = false;
+  recognition = buildRecognition();
+  try { recognition.start(); } catch(e) {}
+
+  startTimer();
+  updateUI();
+  setStatus('Enregistrement en cours…', 'recording');
+  document.getElementById('btnPause').style.display = 'flex';
+}
+
+function stopRecording() {
+  isRecording = false;
+  isPaused = false;
+  clearTimeout(restartTimeout);
+  if (recognition) { try { recognition.stop(); } catch(e) {} recognition = null; }
+  stopTimer();
+  updateUI();
+  setStatus(`Enregistrement terminé — ${formatTime(elapsedSeconds)}`, 'ready');
+  document.getElementById('btnPause').style.display = 'none';
+  removeInterim();
+  saveSession();
+  updateGenerateButton();
+}
+
+function togglePause() {
+  if (!isRecording) return;
+  if (!isPaused) {
+    isPaused = true;
+    clearTimeout(restartTimeout);
+    if (recognition) { try { recognition.stop(); } catch(e) {} }
+    stopTimer();
+    updateUI();
+    setStatus('En pause', 'paused');
+    document.getElementById('btnPause').textContent = '▶️';
+  } else {
+    isPaused = false;
+    recognition = buildRecognition();
+    try { recognition.start(); } catch(e) {}
+    startTimer();
+    updateUI();
+    setStatus('Enregistrement en cours…', 'recording');
+    document.getElementById('btnPause').textContent = '⏸';
+  }
+}
+
+function stopAndReset() {
+  if (!confirm('Arrêter et tout réinitialiser ?')) return;
+  stopRecording();
+  segments = [];
+  elapsedSeconds = 0;
+  document.getElementById('timer').textContent = '00:00';
+  document.getElementById('transcriptBody').innerHTML = '';
+  updateWordCount();
+  updateGenerateButton();
+  clearLocalStorage();
+  setStatus('Réinitialisé', 'ready');
+  document.getElementById('btnPause').style.display = 'none';
+}
+
+// ─────────────────────────────────────────────
+// TIMER
+// ─────────────────────────────────────────────
+function startTimer() {
+  timerInterval = setInterval(() => {
+    elapsedSeconds++;
+    document.getElementById('timer').textContent = formatTime(elapsedSeconds);
+  }, 1000);
+}
+function stopTimer() { clearInterval(timerInterval); }
+function formatTime(s) {
+  const m = Math.floor(s / 60).toString().padStart(2, '0');
+  const sec = (s % 60).toString().padStart(2, '0');
+  return `${m}:${sec}`;
+}
+
+// ─────────────────────────────────────────────
+// TRANSCRIPT
+// ─────────────────────────────────────────────
+function addSegment(text) {
+  const seg = {
+    type: 'speech',
+    speaker: currentSpeaker,
+    text,
+    time: formatTime(elapsedSeconds)
+  };
+  segments.push(seg);
+  renderSegment(seg);
+  updateWordCount();
+  updateGenerateButton();
+  saveSession();
+
+  // Auto-scroll
+  const body = document.getElementById('transcriptBody');
+  body.scrollTop = body.scrollHeight;
+}
+
+function renderSegment(seg) {
+  const body = document.getElementById('transcriptBody');
+  removeInterim();
+
+  const div = document.createElement('div');
+  if (seg.type === 'marker') {
+    div.className = 'segment marker';
+    div.textContent = `📌 ${seg.text}`;
+  } else {
+    div.className = 'segment';
+    const meta = document.createElement('div');
+    meta.className = 'segment-meta';
+    if (seg.speaker) {
+      const spEl = document.createElement('span');
+      spEl.className = 'segment-speaker';
+      spEl.textContent = seg.speaker;
+      meta.appendChild(spEl);
+    }
+    const timeEl = document.createElement('span');
+    timeEl.textContent = seg.time;
+    meta.appendChild(timeEl);
+    div.appendChild(meta);
+    const textEl = document.createElement('div');
+    textEl.textContent = seg.text;
+    div.appendChild(textEl);
+  }
+  body.appendChild(div);
+}
+
+function showInterim(text) {
+  const body = document.getElementById('transcriptBody');
+  removeInterim();
+  if (!text.trim()) return;
+  interimDiv = document.createElement('div');
+  interimDiv.className = 'interim-text';
+  interimDiv.textContent = text + '…';
+  body.appendChild(interimDiv);
+  body.scrollTop = body.scrollHeight;
+}
+
+function removeInterim() {
+  if (interimDiv && interimDiv.parentNode) {
+    interimDiv.parentNode.removeChild(interimDiv);
+  }
+  interimDiv = null;
+}
+
+function setSpeaker() {
+  const val = document.getElementById('speakerInput').value.trim();
+  currentSpeaker = val;
+  if (val) {
+    showToast(`👤 Intervenant : ${val}`);
+  }
+}
+
+function addMarker() {
+  const input = document.getElementById('speakerInput');
+  const label = input.value.trim() || prompt('Texte du repère (ex: Point 3 - Ravalement)');
+  if (!label) return;
+  const seg = { type: 'marker', text: label, time: formatTime(elapsedSeconds) };
+  segments.push(seg);
+  renderSegment(seg);
+  input.value = '';
+  saveSession();
+}
+
+function clearTranscript() {
+  if (segments.length === 0) return;
+  if (!confirm('Effacer toute la transcription ?')) return;
+  segments = [];
+  document.getElementById('transcriptBody').innerHTML = '';
+  updateWordCount();
+  updateGenerateButton();
+  saveSession();
+}
+
+function updateWordCount() {
+  const words = segments
+    .filter(s => s.type === 'speech')
+    .map(s => s.text)
+    .join(' ')
+    .split(/\s+/)
+    .filter(Boolean).length;
+  document.getElementById('wordCount').textContent = `${words} mot${words !== 1 ? 's' : ''}`;
+}
+
+// ─────────────────────────────────────────────
+// UI STATE
+// ─────────────────────────────────────────────
+function updateUI() {
+  const btn = document.getElementById('btnRecord');
+  const icon = document.getElementById('btnRecordIcon');
+  const label = document.getElementById('btnRecordLabel');
+  const timer = document.getElementById('timer');
+
+  if (isRecording && !isPaused) {
+    btn.className = 'btn-record recording';
+    icon.textContent = '⏹';
+    label.textContent = 'Arrêter l\'enregistrement';
+    timer.className = 'timer-pill recording';
+  } else if (isRecording && isPaused) {
+    btn.className = 'btn-record paused';
+    icon.textContent = '▶️';
+    label.textContent = 'Reprendre l\'enregistrement';
+    timer.className = 'timer-pill paused';
+  } else {
+    btn.className = 'btn-record idle';
+    icon.textContent = '🎙️';
+    label.textContent = segments.length > 0 ? 'Reprendre l\'enregistrement' : 'Démarrer l\'enregistrement';
+    timer.className = 'timer-pill';
+  }
+}
+
+function updateGenerateButton() {
+  const btn = document.getElementById('btnGenerate');
+  const hasContent = segments.filter(s => s.type === 'speech').length > 0;
+  btn.disabled = !hasContent;
+}
+
+function setStatus(text, state) {
+  document.getElementById('statusText').textContent = text;
+  const dot = document.getElementById('statusDot');
+  dot.className = 'status-dot' + (state ? ` ${state}` : '');
+}
+
+// ─────────────────────────────────────────────
+// COMPTE RENDU SHEET
+// ─────────────────────────────────────────────
+function buildPrompt() {
+  const date = document.getElementById('agDate').value || '(non renseignée)';
+  const time = document.getElementById('agTime').value || '(non renseignée)';
+  const address = document.getElementById('agAddress').value.trim() || '(non renseignée)';
+  const syndic = document.getElementById('agSyndic').value.trim() || '(non renseigné)';
+
+  const transcriptText = segments.map(seg => {
+    if (seg.type === 'marker') return `\n=== ${seg.text} ===\n`;
+    const speaker = seg.speaker ? `[${seg.speaker}]` : '[Intervenant]';
+    return `${seg.time} ${speaker} ${seg.text}`;
+  }).join('\n');
+
+  return `Tu es expert en droit de la copropriété française. Voici la transcription brute d'une Assemblée Générale.
+
+INFORMATIONS DE SÉANCE
+──────────────────────
+Date : ${date}
+Heure : ${time}
+Résidence : ${address}
+Syndic / Président : ${syndic}
+Durée enregistrée : ${formatTime(elapsedSeconds)}
+
+TRANSCRIPTION BRUTE
+────────────────────
+${transcriptText}
+
+MISSION
+────────
+Génère un compte rendu officiel d'AG de copropriété structuré ainsi :
+
+1. En-tête officiel (résidence, date, heure, lieu)
+2. Présences et représentations (déduis des noms mentionnés dans la transcription)
+3. Bureau de séance (président, secrétaire, scrutateurs)
+4. Pour chaque point à l'ordre du jour :
+   - Numéro et intitulé
+   - Synthèse des discussions (points clés)
+   - Résolution proposée
+   - Vote : POUR ___ / CONTRE ___ / ABSTENTION ___
+   - Décision : ADOPTÉE / REJETÉE
+5. Questions diverses
+6. Date de clôture
+
+Utilise un style formel et juridiquement correct. Si des informations manquent dans la transcription, indique-le clairement entre [crochets].`;
+}
+
+function openSheet() {
+  document.getElementById('promptArea').textContent = buildPrompt();
+  document.getElementById('overlay').classList.add('active');
+}
+
+function closeSheet() {
+  document.getElementById('overlay').classList.remove('active');
+}
+
+function closeSheetOnOutside(e) {
+  if (e.target === document.getElementById('overlay')) closeSheet();
+}
+
+function copyPrompt() {
+  const text = document.getElementById('promptArea').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('✅ Copié dans le presse-papiers !');
+  }).catch(() => {
+    // Fallback
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('✅ Copié !');
+  });
+}
+
+function openClaude() {
+  copyPrompt();
+  setTimeout(() => {
+    window.open('https://claude.ai', '_blank');
+  }, 400);
+}
+
+// ─────────────────────────────────────────────
+// TOAST
+// ─────────────────────────────────────────────
+let toastTimeout;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ─────────────────────────────────────────────
+// PERSISTENCE
+// ─────────────────────────────────────────────
+function saveSession() {
+  try {
+    localStorage.setItem('ag_segments', JSON.stringify(segments));
+    localStorage.setItem('ag_elapsed', elapsedSeconds);
+    localStorage.setItem('ag_date', document.getElementById('agDate').value);
+    localStorage.setItem('ag_time', document.getElementById('agTime').value);
+    localStorage.setItem('ag_address', document.getElementById('agAddress').value);
+    localStorage.setItem('ag_syndic', document.getElementById('agSyndic').value);
+  } catch(e) {}
+}
+
+function restoreSession() {
+  try {
+    const savedSegments = localStorage.getItem('ag_segments');
+    if (savedSegments) {
+      segments = JSON.parse(savedSegments);
+      const body = document.getElementById('transcriptBody');
+      body.innerHTML = '';
+      segments.forEach(renderSegment);
+      updateWordCount();
+      updateGenerateButton();
+    }
+    const elapsed = localStorage.getItem('ag_elapsed');
+    if (elapsed) {
+      elapsedSeconds = parseInt(elapsed, 10);
+      document.getElementById('timer').textContent = formatTime(elapsedSeconds);
+    }
+    const fields = ['ag_date', 'ag_time', 'ag_address', 'ag_syndic'];
+    const ids = ['agDate', 'agTime', 'agAddress', 'agSyndic'];
+    fields.forEach((key, i) => {
+      const val = localStorage.getItem(key);
+      if (val) document.getElementById(ids[i]).value = val;
+    });
+  } catch(e) {}
+}
+
+function clearLocalStorage() {
+  ['ag_segments','ag_elapsed','ag_date','ag_time','ag_address','ag_syndic'].forEach(k => {
+    try { localStorage.removeItem(k); } catch(e) {}
+  });
+}
+
+// Auto-save on info fields change
+['agDate','agTime','agAddress','agSyndic'].forEach(id => {
+  document.getElementById(id).addEventListener('change', saveSession);
+});
+</script>
+</body>
+</html>
